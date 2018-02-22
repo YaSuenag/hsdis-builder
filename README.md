@@ -4,16 +4,24 @@ Docker container for building [hsdis](http://hg.openjdk.java.net/jdk/jdk/file/ti
 
 Base image of this container is Fedora 26. Thus hsdis which the artifact of this container might not work on older glibc.
 
-## Build container
+## Build image
 
 ```
-$ docker build . -t yasuenag/hsdis-builder:10
+$ docker build . -t yasuenag/hsdis-builder
+```
+
+## Pull image
+
+See [Docker Hub repository](https://hub.docker.com/r/yasuenag/hsdis-builder/)
+
+```
+$ docker pull yasuenag/hsdis-builder
 ```
 
 ## Build hsdis (Run container)
 
 ```
-$ docker run -it --rm --privileged -v /path/to/outdir:/out yasuenag/hsdis-builder:10
+$ docker run -it --rm --privileged -v /path/to/outdir:/out yasuenag/hsdis-builder
 ```
 
 You can get `hsdis-amd64.so` from `/path/to/outdir`.
@@ -22,7 +30,7 @@ If you have OpenJDK source archive from http://hg.openjdk.java.net/ , you can pa
 This container supports tar.bz2, tar.gz, and zip. You need to deploy it to `/path/to/outdir`.
 
 ```
-$ docker run -it --rm --privileged -v /path/to/outdir:/out -e JDK_SRC=<source archive> yasuenag/hsdis-builder:10
+$ docker run -it --rm --privileged -v /path/to/outdir:/out -e JDK_SRC=<source archive> yasuenag/hsdis-builder
 ```
 
 ## Deploy hsdis
