@@ -24,6 +24,7 @@ $ docker pull yasuenag/hsdis-builder
 $ docker run -it --rm --privileged -v /path/to/outdir:/out yasuenag/hsdis-builder
 ```
 
+Download JDK source from http://hg.openjdk.java.net/jdk/hs/archive/tip.tar.bz2 , and build hsdis.
 You can get `hsdis-amd64.so` from `/path/to/outdir`.
 
 If you have OpenJDK source archive from http://hg.openjdk.java.net/ , you can pass it to `JDK_SRC` and can avoid download phase.
