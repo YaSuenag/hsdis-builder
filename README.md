@@ -1,4 +1,5 @@
 # hsdis-builder
+![Container ready](../../actions/workflows/publish-container.yaml/badge.svg)
 
 Docker container for building [hsdis](http://hg.openjdk.java.net/jdk/jdk/file/tip/src/utils/hsdis/README). This container can build hsdis for Linux x64 in JDK 10 or later.
 
@@ -12,16 +13,16 @@ $ docker build . -t yasuenag/hsdis-builder
 
 ## Pull image
 
-See [Docker Hub repository](https://hub.docker.com/r/yasuenag/hsdis-builder/)
+See [GitHub Container Registry](https://github.com/YaSuenag/hsdis-builder/pkgs/container/hsdis-builder)
 
 ```
-$ docker pull yasuenag/hsdis-builder
+$ docker pull ghcr.io/yasuenag/hsdis-builder
 ```
 
 ## Build hsdis (Run container)
 
 ```
-$ docker run -it --rm --privileged -v /path/to/outdir:/out yasuenag/hsdis-builder
+$ docker run -it --rm --privileged -v /path/to/outdir:/out ghcr.io/yasuenag/hsdis-builder
 ```
 
 Download JDK source from http://hg.openjdk.java.net/jdk/hs/archive/tip.tar.bz2 , and build hsdis.
@@ -31,7 +32,7 @@ If you have OpenJDK source archive from http://hg.openjdk.java.net/ , you can pa
 This container supports tar.bz2, tar.gz, and zip. You need to deploy it to `/path/to/outdir`.
 
 ```
-$ docker run -it --rm --privileged -v /path/to/outdir:/out -e JDK_SRC=<source archive> yasuenag/hsdis-builder
+$ docker run -it --rm --privileged -v /path/to/outdir:/out -e JDK_SRC=<source archive> ghcr.io/yasuenag/hsdis-builder
 ```
 
 ## Deploy hsdis
