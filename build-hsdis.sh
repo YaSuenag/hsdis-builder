@@ -1,21 +1,48 @@
 #!/bin/sh
 
-cd /out
+JDKVER=$1
 
-if [ -z "$JDK_SRC" ]; then
-  JDK_SRC=http://hg.openjdk.java.net/jdk/hs/archive/tip.tar.bz2
-  wget $JDK_SRC
-fi
+mkdir builder
+cd builder
 
-FILENAME=`basename $JDK_SRC`
-MIME=`file --mime-type $FILENAME | cut -d' ' -f 2`
-
-if [ $MIME = 'application/zip' ]; then
-  unzip $FILENAME
+if [ -z "$JDKVER" ]; then
+  JDK_SRC_LINK=https://github.com/openjdk/jdk/archive/refs/heads/master.tar.gz
+  BOOT_JDK_VER=`curl -s https://api.adoptium.net/v3/info/available_releases | jq -r .most_recent_feature_release`
 else
-  tar xvf $FILENAME
+  JDK_SRC_LINK=https://github.com/openjdk/jdk/archive/refs/tags/$JDKVER.tar.gz
+  JDK_RELEASE_VER=`echo $JDKVER | tr +- , | cut -d , -f 2`
+  if [ $JDK_RELEASE_VER -lt 19 ]; then
+    echo 'hsdis-builder supports JDK 19 or later.'
+    exit 1
+  fi
+  BOOT_JDK_VER=`expr $JDK_RELEASE_VER - 1`
 fi
 
-cd */src/utils/hsdis
-make BINUTILS=~/rpmbuild/BUILD/binutils-* ARCH=amd64
-cp -f build/linux-amd64/hsdis-amd64.so /out/
+echo 'Download and extract JDK source'
+curl -sL $JDK_SRC_LINK | tar xvz
+pushd jdk* > /dev/null
+JDK_SRC=`pwd`
+popd > /dev/null
+echo
+
+# Determine CPU architecture
+ARCH=`uname -m`
+if [ "$ARCH" == x86_64 ]; then
+  ARCH=x64
+fi
+echo "CPU architecture: $ARCH"
+echo
+
+echo 'Retrieve boot JDK'
+BOOT_JDK_LINK=`curl -s "https://api.adoptium.net/v3/assets/latest/$BOOT_JDK_VER/hotspot?architecture=$ARCH&image_type=jdk&os=linux&vendor=eclipse" | jq -r '.[0].binary.package.link'`
+curl -sL "$BOOT_JDK_LINK" | tar xvz
+pushd jdk-$BOOT_JDK_VER** > /dev/null
+export JAVA_HOME=`pwd`
+popd > /dev/null
+echo
+
+echo 'Build HSDIS'
+cd $JDK_SRC
+bash configure --with-hsdis=capstone
+make build-hsdis
+cp build/linux-*/support/hsdis/hsdis-*.so /out/

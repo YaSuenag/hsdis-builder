@@ -1,14 +1,15 @@
-# hsdis-builder
+hsdis-builder
+===
 ![Container ready](../../actions/workflows/publish-container.yaml/badge.svg)
 
-Docker container for building [hsdis](http://hg.openjdk.java.net/jdk/jdk/file/tip/src/utils/hsdis/README). This container can build hsdis for Linux x64 in JDK 10 or later.
+Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by [Capstone](https://www.capstone-engine.org/) for Linux x64 in JDK 19 or later.
 
-Base image of this container is Fedora 26. Thus hsdis which the artifact of this container might not work on older glibc.
+Base image of this container is Fedora 37. Thus HSDIS which the artifact of this container might not work on older glibc.
 
 ## Build image
 
-```
-$ docker build . -t yasuenag/hsdis-builder
+```sh
+$ buildah bud --layers -t hsdis-builder .
 ```
 
 ## Pull image
@@ -16,33 +17,37 @@ $ docker build . -t yasuenag/hsdis-builder
 See [GitHub Container Registry](https://github.com/YaSuenag/hsdis-builder/pkgs/container/hsdis-builder)
 
 ```
-$ docker pull ghcr.io/yasuenag/hsdis-builder
+$ podman pull ghcr.io/yasuenag/hsdis-builder
 ```
 
-## Build hsdis (Run container)
+## Build HSDIS (Run container)
 
-```
-$ docker run -it --rm --privileged -v /path/to/outdir:/out ghcr.io/yasuenag/hsdis-builder
-```
+You can get the artifact (HSDIS) from `out` in following example.
 
-Download JDK source from http://hg.openjdk.java.net/jdk/hs/archive/tip.tar.bz2 , and build hsdis.
-You can get `hsdis-amd64.so` from `/path/to/outdir`.
+### Build HSDIS from upstream
 
-If you have OpenJDK source archive from http://hg.openjdk.java.net/ , you can pass it to `JDK_SRC` and can avoid download phase.
-This container supports tar.bz2, tar.gz, and zip. You need to deploy it to `/path/to/outdir`.
-
-```
-$ docker run -it --rm --privileged -v /path/to/outdir:/out -e JDK_SRC=<source archive> ghcr.io/yasuenag/hsdis-builder
+```sh
+$ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder jdk-19-ga
 ```
 
-## Deploy hsdis
+### Build HSDIS from specified version
 
+You need to specify tag in https://github.com/openjdk/jdk
+
+```sh
+$ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder jdk-19-ga
 ```
+
+## Deploy HSDIS
+
+### JDK 8 or earlier
+
+```sh
 $ cp hsdis-amd64.so $JAVA_HOME/jre/lib/amd64/
 ```
 
-## Notes
+### JDK 9 or later
 
-hsdis cannot be built with binutils 2.29 or later due to [refactoring of binutils](https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commit;f=include/dis-asm.h;h=003ca0fd22863aaf1a9811c8a35a0133a2d27fb1). So I choose Fedora 26 for base image.
-This problem will be fixed in [JDK-8191006](https://bugs.openjdk.java.net/browse/JDK-8191006).
-
+```sh
+$ cp hsdis-amd64.so $JAVA_HOME/lib/
+```
