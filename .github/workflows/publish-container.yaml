@@ -39,7 +39,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/yasuenag/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/yasuenag/hsdis-builder:latest
 
       - name: Delete old latest blobs
         uses: actions/delete-package-versions@v4
