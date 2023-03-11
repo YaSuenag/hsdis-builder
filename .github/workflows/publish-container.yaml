@@ -33,22 +33,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4.3.0
-        with:
-          tags: |
-            # set latest tag for default branch
-            type=raw,value=latest,enable={{is_default_branch}}
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.0.0
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: YaSuenag/hsdis-builder:latest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Delete old latest blobs
