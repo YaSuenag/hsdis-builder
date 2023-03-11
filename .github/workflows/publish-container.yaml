@@ -43,3 +43,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Delete old latest blobs
+        uses: actions/delete-package-versions@v4
+        package-name: hsdis-builder
+        package-type: container
+        min-versions-to-keep: 0
+        delete-only-untagged-versions: true
