@@ -2,7 +2,7 @@ name: Publish container image
 
 on:
   push:
-    branches: [master]
+    branches: [master, ghatest]
   workflow_dispatch:
 
 env:
@@ -40,6 +40,7 @@ jobs:
           tags: |
             # set latest tag for default branch
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value={{branch}}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
@@ -47,7 +48,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          outputs: type=image,push=true
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
