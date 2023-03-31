@@ -48,10 +48,33 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
 
+      - name: Retrieve older images which should be removed
+        id: remove-images
+        run: |
+          $headers = @{"Authorization" = "Bearer ${{ github.token }}";
+                       "Accept" = "application/vnd.github+json";
+                       "X-GitHub-Api-Version" = "2022-11-28"}
+          $versions = Invoke-WebRequest -Headers $headers https://api.github.com/user/packages/container/hsdis-builder/versions | ConvertFrom-Json
+          $latest = $versions | Where-Object {$_.metadata.container.tags.Contains("latest")} | Select-Object -First 1
+          $latest_sha = $latest.name
+
+          $shas = New-Object System.Collections.Generic.HashSet[string]
+          [void]$shas.Add($latest_sha)
+
+          $repo = "${{ env.IMAGE_NAME }}".ToLower()
+          $manifests = docker manifest inspect ghcr.io/$repo@$latest_sha
+          ConvertFrom-Json -InputObject $manifests | Select-Object -ExpandProperty "manifests" | ForEach-Object {[void]$shas.Add($_.digest)}
+
+          $ids = New-Object System.Collections.Generic.HashSet[string]
+          $versions | Where-Object {!$shas.Contains($_.name)} | ForEach-Object {[void]$ids.add($_.id)}
+
+          $remove_images = $ids -join ","
+          "REMOVE_IMAGES=$remove_images" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
       - name: Delete old latest blobs
         uses: actions/delete-package-versions@v4
         with:
           package-name: hsdis-builder
           package-type: container
-          min-versions-to-keep: 2
-          delete-only-untagged-versions: true
+          package-version-ids: ${{ steps.remove-images.outputs.REMOVE_IMAGES }}
