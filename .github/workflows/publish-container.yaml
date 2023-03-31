@@ -72,7 +72,7 @@ jobs:
           # Retrieve information of children of latest image
           docker manifest inspect ${{ env.REGISTRY }}/$image_lower@$latest_sha |
               Out-String |
-              ConvertFrom-Json -InputObject $manifests |
+              ConvertFrom-Json |
               Select-Object -ExpandProperty "manifests" |
               ForEach-Object {[void]$shas.Add($_.digest)}
 
