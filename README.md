@@ -27,7 +27,7 @@ You can get the artifact (HSDIS) from `out` in following example.
 ### Build HSDIS from upstream
 
 ```sh
-$ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder jdk-19-ga
+$ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder
 ```
 
 ### Build HSDIS from specified version
