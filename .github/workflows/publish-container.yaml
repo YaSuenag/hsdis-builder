@@ -52,22 +52,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
 
-      - name: Retrieve all of images in GitHub Packages
-        id: retrieve-versions
-        uses: actions/github-script@v6
-        with:
-          debug: true
-          result-encoding: string
-          script: |
-            github.rest.packages.getAllPackageVersionsForPackageOwnedByAuthenticatedUser({
-              package_type: "container",
-              package_name: context.repo.repo,
-            })
-
       - name: Retrieve older images which should be removed
         id: remove-images
         run: |
-          $versions = ConvertFrom-Json -InputObject '${{ steps.retrieve-versions.outputs.result }}'
+          $image_lower = "${{ env.IMAGE_NAME }}".ToLower()
+          $repo = $image_lower.Split('/')[1]
+
+          # Retrieve information of all of container images
+          $versions = gh api user/packages/container/$repo/versions | ConvertFrom-Json
 
           # Pick up digest of "latest" image
           $latest_sha = $versions |
@@ -78,7 +70,6 @@ jobs:
           [void]$shas.Add($latest_sha)
 
           # Retrieve information of children of latest image
-          $image_lower = "${{ env.IMAGE_NAME }}".ToLower()
           docker manifest inspect ${{ env.REGISTRY }}/$image_lower@$latest_sha |
               Out-String |
               ConvertFrom-Json |
