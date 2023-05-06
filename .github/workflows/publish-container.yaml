@@ -56,6 +56,7 @@ jobs:
         id: retrieve-versions
         uses: actions/github-script@v6
         with:
+          debug: true
           result-encoding: string
           script: |
             github.rest.packages.getAllPackageVersionsForPackageOwnedByAuthenticatedUser({
