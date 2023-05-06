@@ -83,6 +83,8 @@ jobs:
 
           $remove_images = $ids -join ","
           "REMOVE_IMAGES=$remove_images" >> $env:GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         shell: pwsh
 
       - name: Delete old latest blobs
