@@ -59,7 +59,7 @@ jobs:
           result-encoding: string
           script: |
             github.rest.packages.getAllPackageVersionsForPackageOwnedByAuthenticatedUser({
-              package_type: container,
+              package_type: "container",
               package_name: context.repo.repo,
             })
 
