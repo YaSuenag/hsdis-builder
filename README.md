@@ -4,7 +4,7 @@ hsdis-builder
 
 Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by [Capstone](https://www.capstone-engine.org/) for Linux x64 in JDK 19 or later.
 
-Base image of this container is Fedora 38. Thus HSDIS which the artifact of this container might not work on older glibc.
+Base image of this container is Fedora 39. Thus HSDIS which the artifact of this container might not work on older glibc.
 
 ## Build image
 
@@ -26,16 +26,28 @@ You can get the artifact (HSDIS) from `out` in following example.
 
 ### Build HSDIS from upstream
 
-```sh
-$ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder
+```
+podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder
+```
+
+Link Capstone statically
+
+```
+podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder -static
 ```
 
 ### Build HSDIS from specified version
 
 You need to specify tag in https://github.com/openjdk/jdk
 
-```sh
-$ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder jdk-19-ga
+```
+podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder jdk-19-ga
+```
+
+Link Capstone statically
+
+```
+podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder -static jdk-19-ga
 ```
 
 ## Deploy HSDIS

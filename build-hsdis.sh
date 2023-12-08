@@ -1,6 +1,21 @@
 #!/bin/sh
 
-JDKVER=$1
+ARG1=$1
+ARG2=$2
+
+if [ -z "$ARG1" ]; then
+  IS_STATIC=0
+  JDKVER=""
+elif [ "$ARG1" = "-static" ]; then
+  IS_STATIC=1
+  JDKVER="$ARG2"
+elif [ "${ARG1:0:1}" != '-' ]; then
+  IS_STATIC=0
+  JDKVER="$ARG1"
+else
+  echo "Unknow option: $ARG1"
+  exit 100
+fi
 
 mkdir builder
 cd builder
@@ -35,14 +50,35 @@ echo
 
 echo 'Retrieve boot JDK'
 BOOT_JDK_LINK=`curl -sSL "https://api.adoptium.net/v3/assets/latest/$BOOT_JDK_VER/hotspot?architecture=$ARCH&image_type=jdk&os=linux&vendor=eclipse" | jq -r '.[0].binary.package.link' || exit 3`
-curl -sL "$BOOT_JDK_LINK" | tar xvz || exit 4
+curl -sSL "$BOOT_JDK_LINK" | tar xvz || exit 4
 pushd jdk-$BOOT_JDK_VER** > /dev/null
 export JAVA_HOME=`pwd`
 popd > /dev/null
 echo
 
+
+# Prepare Capstone
+CONFIGURE_OPTS=--with-hsdis=capstone
+if [ $IS_STATIC -eq 1 ]; then
+  echo 'Retrieve Capstone'
+  CAPSTONE_URL=`curl -sSL https://api.github.com/repos/capstone-engine/capstone/releases/latest | jq -r .tarball_url` || exit 5
+  curl -sSL "$CAPSTONE_URL" | tar xvz || exit 6
+  echo
+
+  echo 'Build Capstone'
+  pushd capstone*
+  CAPSTONE_STATIC=yes CAPSTONE_SHARED=no PREFIX=/opt/capstone ./make.sh install || exit 7
+  popd > /dev/null
+  CONFIGURE_OPTS="$CONFIGURE_OPTS --with-capstone=/opt/capstone"
+
+  # to find cflags in configure script
+  export PKG_CONFIG_PATH=`pwd`/opt/capstone/lib/pkgconfig
+  echo
+fi
+
+
 echo 'Build HSDIS'
 cd $JDK_SRC
-bash configure --with-hsdis=capstone && \
+bash configure $CONFIGURE_OPTS && \
   make build-hsdis && \
   cp build/linux-*/support/hsdis/hsdis-*.so /out/
