@@ -1,4 +1,4 @@
-FROM fedora:38
+FROM fedora:39
 LABEL maintainer "Yasumasa Suenaga <yasuenag@gmail.com>"
 
 RUN dnf upgrade -y && \
