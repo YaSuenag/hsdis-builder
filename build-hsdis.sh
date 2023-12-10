@@ -77,6 +77,13 @@ if [ $IS_STATIC -eq 1 ]; then
 fi
 
 
+# Allow HSDIS for Linux building on WSL
+IS_WSL=`uname -r | grep -i microsoft > /dev/null`
+if [ $? -eq 0 ]; then
+  CONFIGURE_OPTS="$CONFIGURE_OPTS --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu"
+fi
+
+
 echo 'Build HSDIS'
 cd $JDK_SRC
 bash configure $CONFIGURE_OPTS && \
