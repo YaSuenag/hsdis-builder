@@ -6,12 +6,6 @@ Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master
 
 Base image of this container is Fedora 39. Thus HSDIS which the artifact of this container might not work on older glibc.
 
-## Build image
-
-```sh
-$ buildah bud --layers -t hsdis-builder .
-```
-
 ## Pull image
 
 See [GitHub Container Registry](https://github.com/YaSuenag/hsdis-builder/pkgs/container/hsdis-builder)
@@ -27,13 +21,13 @@ You can get the artifact (HSDIS) from `out` in following example.
 ### Build HSDIS from upstream
 
 ```
-podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder
 ```
 
 Link Capstone statically
 
 ```
-podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder -static
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -static
 ```
 
 ### Build HSDIS from specified version
@@ -41,13 +35,13 @@ podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder -static
 You need to specify tag in https://github.com/openjdk/jdk
 
 ```
-podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder jdk-19-ga
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder jdk-19-ga
 ```
 
 Link Capstone statically
 
 ```
-podman run -it --rm -v /path/to/outdir:/out:Z hsdis-builder -static jdk-19-ga
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -static jdk-19-ga
 ```
 
 ## Deploy HSDIS
@@ -62,4 +56,10 @@ $ cp hsdis-amd64.so $JAVA_HOME/jre/lib/amd64/
 
 ```sh
 $ cp hsdis-amd64.so $JAVA_HOME/lib/
+```
+
+## Build container image
+
+```sh
+$ buildah bud --layers -t hsdis-builder .
 ```
