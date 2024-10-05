@@ -1,5 +1,5 @@
 FROM fedora:39
-LABEL maintainer "Yasumasa Suenaga <yasuenag@gmail.com>"
+LABEL maintainer="Yasumasa Suenaga <yasuenag@gmail.com>"
 
 RUN dnf upgrade -y && \
     dnf install -y jq zip unzip file diffutils capstone-devel autoconf gcc-c++ \
