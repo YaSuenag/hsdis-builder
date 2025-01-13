@@ -74,6 +74,11 @@ if [ $IS_STATIC -eq 1 ]; then
   # to find cflags in configure script
   export PKG_CONFIG_PATH=`pwd`/opt/capstone/lib/pkgconfig
   echo
+
+  echo 'Apply pacth of JDK-8347500'
+  pushd $JDK_SRC
+  curl -sSL https://git.openjdk.org/jdk/pull/23059.diff | patch -p1
+  popd > /dev/null
 fi
 
 
