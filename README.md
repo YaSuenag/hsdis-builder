@@ -2,7 +2,7 @@ hsdis-builder
 ===
 ![Container ready](../../actions/workflows/publish-container.yaml/badge.svg)
 
-Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by [Capstone](https://www.capstone-engine.org/) for Linux x64/aarch64 in JDK 19 or later.
+Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by [Capstone](https://www.capstone-engine.org/) for Linux x64/aarch64 in JDK 25 or later.
 
 Base image of this container is Fedora 39. Thus HSDIS which the artifact of this container might not work on older glibc.
 
@@ -32,16 +32,19 @@ podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -st
 
 ### Build HSDIS from specified version
 
+> [!NOTE]
+> JDK 25 will be released in September 2025 - meanwhile you need to use upstream OpenJDK code.
+
 You need to specify tag in https://github.com/openjdk/jdk
 
 ```
-podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder jdk-19-ga
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder jdk-25-ga
 ```
 
 Link Capstone statically
 
 ```
-podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -static jdk-19-ga
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -static jdk-25-ga
 ```
 
 ## Deploy HSDIS

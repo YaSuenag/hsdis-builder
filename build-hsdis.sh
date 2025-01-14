@@ -26,8 +26,8 @@ if [ -z "$JDKVER" ]; then
 else
   JDK_SRC_LINK=https://github.com/openjdk/jdk/archive/refs/tags/$JDKVER.tar.gz
   JDK_RELEASE_VER=`echo $JDKVER | tr +- , | cut -d , -f 2`
-  if [ $JDK_RELEASE_VER -lt 19 ]; then
-    echo 'hsdis-builder supports JDK 19 or later.'
+  if [ $JDK_RELEASE_VER -lt 25 ]; then
+    echo 'hsdis-builder supports JDK 25 or later.'
     exit 1
   fi
   BOOT_JDK_VER=`expr $JDK_RELEASE_VER - 1`
@@ -74,11 +74,6 @@ if [ $IS_STATIC -eq 1 ]; then
   # to find cflags in configure script
   export PKG_CONFIG_PATH=`pwd`/opt/capstone/lib/pkgconfig
   echo
-
-  echo 'Apply pacth of JDK-8347500'
-  pushd $JDK_SRC
-  curl -sSL https://git.openjdk.org/jdk/pull/23059.diff | patch -p1
-  popd > /dev/null
 fi
 
 
