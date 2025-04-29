@@ -4,7 +4,7 @@ hsdis-builder
 
 Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by [Capstone](https://www.capstone-engine.org/) for Linux x64/aarch64 in JDK 25 or later.
 
-Base image of this container is Fedora 39. Thus HSDIS which the artifact of this container might not work on older glibc.
+Base image of this container is Fedora 42. Thus HSDIS which the artifact of this container might not work on older glibc.
 
 ## Pull image
 

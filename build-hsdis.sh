@@ -57,26 +57,6 @@ popd > /dev/null
 echo
 
 
-# Prepare Capstone
-CONFIGURE_OPTS=--with-hsdis=capstone
-if [ $IS_STATIC -eq 1 ]; then
-  echo 'Retrieve Capstone'
-  CAPSTONE_URL=`curl -sSL https://api.github.com/repos/capstone-engine/capstone/releases/latest | jq -r .tarball_url` || exit 5
-  curl -sSL "$CAPSTONE_URL" | tar xvz || exit 6
-  echo
-
-  echo 'Build Capstone'
-  pushd capstone*
-  CAPSTONE_STATIC=yes CAPSTONE_SHARED=no PREFIX=/opt/capstone ./make.sh install || exit 7
-  popd > /dev/null
-  CONFIGURE_OPTS="$CONFIGURE_OPTS --with-capstone=/opt/capstone"
-
-  # to find cflags in configure script
-  export PKG_CONFIG_PATH=`pwd`/opt/capstone/lib/pkgconfig
-  echo
-fi
-
-
 # Allow HSDIS for Linux building on WSL
 IS_WSL=`uname -r | grep -i microsoft > /dev/null`
 if [ $? -eq 0 ]; then
@@ -84,8 +64,17 @@ if [ $? -eq 0 ]; then
 fi
 
 
-echo 'Build HSDIS'
+echo 'Run configure script'
 cd $JDK_SRC
-bash configure $CONFIGURE_OPTS && \
-  make build-hsdis && \
+bash configure --with-hsdis=capstone
+
+
+# Override spec.gmk to use static library if needs
+if [ $IS_STATIC -eq 1 ]; then
+  sed -i 's|^HSDIS_LIBS :=.\+$|HSDIS_LIBS := /usr/lib64/libcapstone.a|' build/linux-*/spec.gmk
+fi
+
+
+echo 'Build HSDIS'
+make build-hsdis && \
   cp build/linux-*/support/hsdis/hsdis-*.so /out/
