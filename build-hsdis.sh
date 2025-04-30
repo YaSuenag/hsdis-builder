@@ -57,6 +57,8 @@ popd > /dev/null
 echo
 
 
+CONFIGURE_OPTS=--with-hsdis=capstone
+
 # Allow HSDIS for Linux building on WSL
 IS_WSL=`uname -r | grep -i microsoft > /dev/null`
 if [ $? -eq 0 ]; then
@@ -66,7 +68,7 @@ fi
 
 echo 'Run configure script'
 cd $JDK_SRC
-bash configure --with-hsdis=capstone
+bash configure $CONFIGURE_OPTS
 
 
 # Override spec.gmk to use static library if needs
