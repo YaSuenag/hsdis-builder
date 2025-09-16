@@ -32,9 +32,6 @@ podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -st
 
 ### Build HSDIS from specified version
 
-> [!NOTE]
-> JDK 25 will be released in September 2025 - meanwhile you need to use upstream OpenJDK code.
-
 You need to specify tag in https://github.com/openjdk/jdk
 
 ```
