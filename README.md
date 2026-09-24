@@ -2,9 +2,17 @@ hsdis-builder
 ===
 ![Container ready](../../actions/workflows/publish-container.yaml/badge.svg)
 
-Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by [Capstone](https://www.capstone-engine.org/) for Linux x64/aarch64 in JDK 25 or later.
+Docker container for building [HSDIS](https://github.com/openjdk/jdk/tree/master/src/utils/hsdis). This container can build HSDIS powered by Capstone/LLVM for Linux x64/aarch64 in JDK 25 or later.
 
 Base image of this container is Fedora 44. Thus HSDIS which the artifact of this container might not work on older glibc.
+
+## Command line options
+
+| option | value | meaning |
+| --- | --- | --- |
+| `-backend` | [llvm, capstone] | Disassembler backend |
+| `-jdkver` | [JDK tag] | Tag of openjdk/jdk repo to build |
+| `-static` | \<none\> | Link backend statically (Capstone only) |
 
 ## Pull image
 
@@ -24,24 +32,24 @@ You can get the artifact (HSDIS) from `out` in following example.
 podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder
 ```
 
-Link Capstone statically
+#### LLVM backend
+
+```
+podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -backend llvm
+```
+
+#### Static link (Capstone only)
 
 ```
 podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -static
 ```
 
-### Build HSDIS from specified version
+#### Build HSDIS from specified version
 
 You need to specify tag in https://github.com/openjdk/jdk
 
 ```
 podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder jdk-25-ga
-```
-
-Link Capstone statically
-
-```
-podman run -it --rm -v /path/to/outdir:/out:Z ghcr.io/yasuenag/hsdis-builder -static jdk-25-ga
 ```
 
 ## Deploy HSDIS

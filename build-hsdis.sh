@@ -1,21 +1,49 @@
 #!/bin/sh
 
-ARG1=$1
-ARG2=$2
+BACKEND=capstone
+JDKVER=''
+IS_STATIC=0
 
-if [ -z "$ARG1" ]; then
-  IS_STATIC=0
-  JDKVER=""
-elif [ "$ARG1" = "-static" ]; then
-  IS_STATIC=1
-  JDKVER="$ARG2"
-elif [ "${ARG1:0:1}" != '-' ]; then
-  IS_STATIC=0
-  JDKVER="$ARG1"
-else
-  echo "Unknow option: $ARG1"
-  exit 100
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -backend)
+      if [[ -n "$2" && "$2" != -* ]]; then
+        BACKEND="$2"
+        shift 2
+      else
+        echo "-backend does not have a value."
+        exit 1
+      fi
+      ;;
+    -jdkver)
+      if [ -n "$2" && "$2" != -* ]; then
+        JDKVER="$2"
+        shift 2
+      else
+        echo "-jdkver does not have a value"
+        exit 1
+      fi
+      ;;
+    -static)
+      IS_STATIC=1
+      shift 1
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ $IS_STATIC -eq 1 && "$BACKEND" != 'capstone' ]]; then
+  echo '-static is only supported for Capstone'
+  exit 2
 fi
+if [[ $BACKEND != 'capstone' && $BACKEND != 'llvm' ]]; then
+  echo 'Invalid backend value (supported backend: [capstone, llvm])'
+  exit 3
+fi
+
 
 mkdir builder
 cd builder
@@ -57,7 +85,7 @@ popd > /dev/null
 echo
 
 
-CONFIGURE_OPTS=--with-hsdis=capstone
+CONFIGURE_OPTS=--with-hsdis=$BACKEND
 
 # Allow HSDIS for Linux building on WSL
 IS_WSL=`uname -r | grep -i microsoft > /dev/null`
@@ -71,7 +99,7 @@ cd $JDK_SRC
 bash configure $CONFIGURE_OPTS
 
 
-# Override spec.gmk to use static library if needs
+# Override spec.gmk to use static library if needs (Capstone only)
 if [ $IS_STATIC -eq 1 ]; then
   sed -i 's|^HSDIS_LIBS :=.\+$|HSDIS_LIBS := /usr/lib64/libcapstone.a|' build/linux-*/spec.gmk
 fi
